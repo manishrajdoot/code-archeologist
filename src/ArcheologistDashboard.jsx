@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Terminal, FolderOpen, Play, ShieldAlert, Cpu, History, PlusCircle, Search, User, Zap, Globe, Lock, Unlock, Edit3, Trash2, Save, BarChart2, Volume2, VolumeX, EyeOff, ShieldCheck, Info } from 'lucide-react';
+import { Terminal, Play, ShieldAlert, Cpu, Search, User, Zap, Lock, Unlock, Edit3, Trash2, Save, BarChart2, Volume2, VolumeX, ShieldCheck, Info } from 'lucide-react';
 import { supabase } from './supabaseClient';
 
 export default function ArcheologistDashboard() {
@@ -9,9 +9,11 @@ export default function ArcheologistDashboard() {
   const [activeEra, setActiveEra] = useState('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   
-  // Security & Core States
+  // Advanced Simulation States
+  const [isBooting, setIsBooting] = useState(true);
+  const [bootLogs, setBootLogs] = useState([]);
   const [isAudioOn, setIsAudioOn] = useState(true);
-  const [emulatorOutput, setEmulatorOutput] = useState('System Vault Active. Type "sys.social" for Admin links.\n\n[DAILY MOTIVATION] Code is like humor. When you have to explain it, it’s bad.');
+  const [emulatorOutput, setEmulatorOutput] = useState('');
   const [loading, setLoading] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
   const [isEditable, setIsEditable] = useState(false);
@@ -19,12 +21,14 @@ export default function ArcheologistDashboard() {
   const [terminalInput, setTerminalInput] = useState('');
   const [showHiddenSocials, setShowHiddenSocials] = useState(false);
 
-  // Admin Auth Crypt Layer
+  // Security Gate parameters
   const [isAdmin, setIsAdmin] = useState(false);
   const [passphrase, setPassphrase] = useState('');
   const [authError, setAuthError] = useState('');
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [isLockedOut, setIsLockedOut] = useState(false);
 
-  // Form Parameters
+  // Input Fields States
   const [newTitle, setNewTitle] = useState('');
   const [newEra, setNewEra] = useState('MS-DOS Era');
   const [newLanguage, setNewLanguage] = useState('');
@@ -33,23 +37,23 @@ export default function ArcheologistDashboard() {
   const [newCode, setNewCode] = useState('');
   const [formStatus, setFormStatus] = useState('');
 
-  // Motivational Short Quotes Data Engine (Rotates Daily automatically)
+  // Auto-Rotating High Focus Short Quotes
   const getDailyQuote = () => {
     const quotes = [
-      "Fix the cause, not the symptom. — Steve Maguire",
+      "First, solve the problem. Then, write the code. — John Johnson",
       "Simplicity is the soul of efficiency. — Austin Freeman",
       "Make it work, make it right, make it fast. — Kent Beck",
-      "Before software can be reusable it first has to be usable. — Ralph Johnson",
-      "First, solve the problem. Then, write the code. — John Johnson",
-      "Knowledge is power, data is the wealth. — M. Rajdoot"
+      "Knowledge is power, data is the wealth. — M. Rajdoot",
+      "Fix the cause, not the symptom. — Steve Maguire",
+      "Before software can be reusable it first has to be usable. — Ralph Johnson"
     ];
     const day = new Date().getDate();
     return quotes[day % quotes.length];
   };
 
-  // Absolute XSS & Script Injection Neutralizer (Cyber Security Layer)
-  const sanitizeInput = (string) => {
-    return string
+  // Cyber Defense Sanitization Engine (Preventing XSS/SQL Injection)
+  const sanitizeInput = (str) => {
+    return str
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
@@ -57,6 +61,31 @@ export default function ArcheologistDashboard() {
       .replace(/'/g, "&#x27;")
       .replace(/\//g, "&#x2F;");
   };
+
+  // BIOS Preloader Execution Matrix
+  useEffect(() => {
+    const logs = [
+      "[0.00ms] INITIALIZING REGISTER MEMORY CLUSTERS... OK",
+      "[0.03ms] VERIFYING ROOT OVERLORD IDENT: MANISH RAJDOOT ENGINE v5.0",
+      "[0.07ms] SHIELD FIREWALL RE-ENCRYPTING PORT CHANNELS... SUCCESS",
+      "[0.12ms] CORE MOUNTED SUCCESSFULLY. ENTERING SYSTEM GRAPHICS MATRIX..."
+    ];
+    
+    let currentLogIndex = 0;
+    const logInterval = setInterval(() => {
+      if (currentLogIndex < logs.length) {
+        setBootLogs(prev => [...prev, logs[currentLogIndex]]);
+        currentLogIndex++;
+      } else {
+        clearInterval(logInterval);
+        setTimeout(() => {
+          setIsBooting(false);
+        }, 800);
+      }
+    }, 400);
+
+    return () => clearInterval(logInterval);
+  }, []);
 
   const fetchArtifacts = async () => {
     try {
@@ -83,10 +112,11 @@ export default function ArcheologistDashboard() {
   };
 
   useEffect(() => {
-    fetchArtifacts();
-    // Inject dynamic daily quote on startup
-    setEmulatorOutput(`System Vault Online. Awaiting queries...\n\n[DAILY MATRIX FOCUS]: "${getDailyQuote()}"`);
-  }, []);
+    if (!isBooting) {
+      fetchArtifacts();
+      setEmulatorOutput(`System Vault Online. Awaiting core queries...\n\n[DAILY MATRIX FOCUS]: "${getDailyQuote()}"`);
+    }
+  }, [isBooting]);
 
   useEffect(() => {
     let results = artifacts;
@@ -100,21 +130,20 @@ export default function ArcheologistDashboard() {
     setFilteredArtifacts(results);
   }, [searchTerm, activeEra, artifacts]);
 
-  // Audio Beep Frequency Oscillator
+  // Web Audio Frequency Oscillator Engine (Dynamic 8-Bit Audio)
   const playBeep = (freq = 440, type = 'square', duration = 0.08) => {
     if (!isAudioOn) return;
     try {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
       const osc = ctx.createOscillator(); const gain = ctx.createGain();
       osc.type = type; osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.03, ctx.currentTime);
+      gain.gain.setValueAtTime(0.02, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + duration);
       osc.connect(gain); gain.connect(ctx.destination);
       osc.start(); osc.stop(ctx.currentTime + duration);
     } catch (e) {}
   };
 
-  // Execute Host Terminal Interactive Commands
   const handleTerminalCommand = (e) => {
     e.preventDefault();
     const command = terminalInput.trim().toLowerCase();
@@ -122,13 +151,13 @@ export default function ArcheologistDashboard() {
     
     if (command === 'sys.social') {
       setShowHiddenSocials(true);
-      setEmulatorOutput(prev => prev + '\n\n[DECRYPT] Decrypted Manish Rajdoot Hidden Social Matrix channels successfully.');
+      setEmulatorOutput(prev => prev + '\n\n[DECRYPT] Decrypted Manish Rajdoot Hidden Social Matrix portals.');
     } else if (command === 'clear') {
-      setEmulatorOutput('[CONSOLE STREAM PURGED] System ready.');
+      setEmulatorOutput('[CONSOLE STREAM PURGED] Awaiting execution.');
     } else if (command === 'help') {
-      setEmulatorOutput(prev => prev + '\n\nAvailable Core Protocols:\n- sys.social : Mount hidden developer secure lines\n- clear : Flush console storage logs\n- help : Fetch system directives');
+      setEmulatorOutput(prev => prev + '\n\nAvailable Protocols:\n- sys.social : Decrypt developer connection matrix\n- clear : Flush console storage logs\n- help : Fetch system directives');
     } else {
-      setEmulatorOutput(prev => prev + `\n\n[CMD ERROR] Protocol "${command}" unrecognized by secure core kernel.`);
+      setEmulatorOutput(prev => prev + `\n\n[CMD ERROR] Protocol "${command}" unrecognized by system core kernel.`);
     }
     setTerminalInput('');
   };
@@ -144,7 +173,7 @@ export default function ArcheologistDashboard() {
         .eq('id', selectedArtifact.id);
 
       if (error) throw error;
-      setEmulatorOutput(`[PATCH SUCCESS] Integrity verified. Node "${selectedArtifact.title}" hotpatched.`);
+      setEmulatorOutput(`[PATCH SUCCESS] Code structure integrity verified. Block updated successfully.`);
       setIsEditable(false);
       await fetchArtifacts();
     } catch (error) {
@@ -154,12 +183,12 @@ export default function ArcheologistDashboard() {
 
   const handleDeleteArtifact = async (id) => {
     if (!isAdmin) return;
-    if (!window.confirm("[CRITICAL SECURITY] Are you absolutely sure you want to drop this sector?")) return;
+    if (!window.confirm("[CRITICAL SECURITY] Drop this database record permanently?")) return;
     playBeep(180, 'sawtooth', 0.4);
     try {
       const { error } = await supabase.from('artifacts').delete().eq('id', id);
       if (error) throw error;
-      setEmulatorOutput('[SYSTEM PURGE] Record dropped cleanly from matrix servers.');
+      setEmulatorOutput('[SYSTEM PURGE] Record dropped cleanly from server bank.');
       setSelectedArtifact(null);
       await fetchArtifacts();
     } catch (error) {
@@ -169,24 +198,34 @@ export default function ArcheologistDashboard() {
 
   const handleAuthBypass = (e) => {
     e.preventDefault();
+    if (isLockedOut) return;
+
     if (passphrase === 'manish99') {
       setIsAdmin(true); setAuthError('');
       playBeep(1000, 'sine', 0.15);
-      setEmulatorOutput('[ACCESS APEX] Admin signature match found. Security override validated for MANISH RAJDOOT.');
+      setEmulatorOutput('[ACCESS APEX] Admin signature matched. Security lock overridden for MANISH RAJDOOT.');
     } else {
-      setAuthError('INTEGRITY FAULT');
+      const newAttempts = failedAttempts + 1;
+      setFailedAttempts(newAttempts);
       playBeep(100, 'sawtooth', 0.5);
-      setEmulatorOutput('[ALERT] Intrusion mitigation algorithm locked down form node parameters.');
+      
+      if (newAttempts >= 3) {
+        setIsLockedOut(true);
+        setAuthError('IP TERMINAL LOCKED');
+        setEmulatorOutput('[SECURITY WARNING] Brute-force threshold exceeded. Injection module temporarily frozen.');
+      } else {
+        setAuthError(`DENIED (Attempt ${newAttempts}/3)`);
+        setEmulatorOutput('[ALERT] Invalid token signature injection caught by kernel firewall.');
+      }
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isAdmin) return;
-    setFormStatus('[SANITIZING] Running intrusion filters on code stream...');
+    setFormStatus('[SANITIZING] Running structural intrusion scanners...');
 
     try {
-      // High Security Sanitization Filters applied instantly
       const cleanTitle = sanitizeInput(newTitle);
       const cleanLanguage = sanitizeInput(newLanguage);
       const cleanDescription = sanitizeInput(newDescription);
@@ -209,31 +248,38 @@ export default function ArcheologistDashboard() {
     if (!selectedArtifact || isRunning) return;
     setIsRunning(true);
     const lines = [
-      `[SECURE MONITOR] Mounting localized virtual core layers...`,
-      `[INTEGRITY] Security Check: 256-bit hash verification OK.`,
-      `[ADMIN SIGN] Checked by Manish Rajdoot [ROOT]`,
+      `[SECURE MONITOR] Allocating sandbox compiling environment...`,
+      `[INTEGRITY] Security Check: 256-bit hash validation OK.`,
+      `[ANALYSIS] Cyclomatic Code Complexity Tracking Status: OPTIMAL`,
       `\n======================================================`,
-      `               CYBER GRID RESTORATION LIVE            `,
+      `               CYBER GRID EMULATION ACTIVE            `,
       `======================================================`
     ];
     let currentLine = 0;
     const interval = setInterval(() => {
       if (currentLine < lines.length) {
         setEmulatorOutput(prev => prev + '\n' + lines[currentLine]);
-        playBeep(800 + (currentLine * 50), 'square', 0.03);
+        playBeep(750 + (currentLine * 40), 'square', 0.03);
         currentLine++;
       } else {
         clearInterval(interval);
-        setEmulatorOutput(prev => prev + '\n' + editedCode.substring(0, 250) + '\n\n>>> Process isolation completed.');
+        setEmulatorOutput(prev => prev + '\n' + editedCode.substring(0, 350) + '\n\n>>> Sandbox execution completed successfully.');
         setIsRunning(false);
       }
     }, 120);
   };
 
-  if (loading) {
+  // BIOS Boot Screen Rendering Vector
+  if (isBooting) {
     return (
-      <div className="min-h-screen bg-gray-950 text-emerald-400 font-mono flex items-center justify-center crt-effect scanline">
-        <div className="animate-pulse text-xs tracking-[0.5em] font-black retro-glow">[ISOLATING SECURITY CHANNELS FOR RAJDOOT ENGINE...]</div>
+      <div className="min-h-screen bg-gray-950 text-emerald-500 font-mono flex flex-col items-start justify-center p-8 crt-effect scanline select-none">
+        <div className="max-w-2xl space-y-2 text-xs tracking-wider leading-6">
+          <div className="text-emerald-400 font-bold text-sm mb-4 animate-pulse">[SYSTEM BOOT PROTOCOL RE-CONFIGURING]</div>
+          {bootLogs.map((log, index) => (
+            <div key={index} className="whitespace-pre-wrap">{log}</div>
+          ))}
+          <div className="h-4 w-2 bg-emerald-500 animate-ping mt-2 inline-block" />
+        </div>
       </div>
     );
   }
@@ -241,12 +287,12 @@ export default function ArcheologistDashboard() {
   return (
     <div className="min-h-screen bg-gray-950 text-emerald-400 font-mono flex flex-col crt-effect scanline h-screen overflow-hidden select-none">
       
-      {/* Header Panel */}
+      {/* Upper Navigation Bar */}
       <header className="border-b border-emerald-900 bg-gray-900/90 px-6 py-2.5 flex justify-between items-center backdrop-blur-md z-20 shadow-md">
         <div className="flex items-center space-x-3">
           <Terminal className="h-5 w-5 text-emerald-500 animate-pulse" />
           <h1 className="text-lg font-black tracking-widest text-emerald-300 retro-glow uppercase">
-            THE CODE ARCHEOLOGIST <span className="text-[8px] bg-emerald-950 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-800 ml-1 font-bold">STABLE_v4.0_PRO</span>
+            THE CODE ARCHEOLOGIST <span className="text-[8px] bg-emerald-950 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-800 ml-1 font-bold">STABLE_v5.0_PRO</span>
           </h1>
         </div>
         
@@ -259,16 +305,16 @@ export default function ArcheologistDashboard() {
             <span className="text-xs text-emerald-300 font-black tracking-widest retro-glow">MANISH RAJDOOT</span>
           </div>
           <div className="flex items-center space-x-1.5 text-[9px] text-emerald-400 bg-black/60 px-2.5 py-1.5 rounded border border-emerald-900">
-            <ShieldCheck className="h-3.5 w-3.5 text-emerald-400 animate-pulse" />
-            <span className="tracking-widest font-black uppercase">{isAdmin ? 'ROOT FULL ACCESS' : 'SHIELD MATRIX ACTIVE'}</span>
+            <Cpu className="h-3.5 w-3.5 text-emerald-400 animate-pulse" />
+            <span className="tracking-widest font-black uppercase">{isAdmin ? 'ROOT FULL ACCESS' : 'FIREWALL LOCKED'}</span>
           </div>
         </div>
       </header>
 
-      {/* Main Divider Workspace */}
+      {/* Main Framework Divider */}
       <div className="flex-1 flex overflow-hidden z-10">
         
-        {/* Left Side: Search, Filtering, Stats, Profiles */}
+        {/* Left Control Panel: Filters, Analytics, List mapping */}
         <aside className="w-76 border-r border-emerald-900/40 bg-black/50 flex flex-col backdrop-blur-md">
           <div className="p-4 space-y-3 flex flex-col h-full overflow-hidden">
             
@@ -292,16 +338,15 @@ export default function ArcheologistDashboard() {
               ))}
             </div>
 
-            {/* LIVE ANALYTICS MINILOG */}
+            {/* DYNAMIC REAL-TIME METRICS MATRIX */}
             <div className="border border-emerald-950 bg-black/80 p-2.5 rounded text-[9px] space-y-1 font-mono tracking-wide">
-              <div className="text-[8px] text-emerald-700 font-black flex items-center mb-0.5"><BarChart2 className="h-3 w-3 mr-1" /> VAULT MEMORY BUFFER STATUS</div>
-              <div className="flex justify-between"><span>SECURE INDEXED CLUSTERS:</span><span className="text-emerald-400 font-bold">{artifacts.length}</span></div>
-              <div className="flex justify-between"><span>FIREWALL INTEGRITY RATE:</span><span className="text-cyan-400 font-bold">100.00%</span></div>
-              <div className="flex justify-between"><span>SYS MODEL LATENCY:</span><span>0.002ms</span></div>
+              <div className="text-[8px] text-emerald-700 font-black flex items-center mb-0.5"><BarChart2 className="h-3 w-3 mr-1" /> CORE VECTOR ANALYTICS</div>
+              <div className="flex justify-between"><span>INDEXED CLUSTERS:</span><span className="text-emerald-400 font-bold">{artifacts.length}</span></div>
+              <div className="flex justify-between"><span>FIREWALL INTEGRITY:</span><span className="text-cyan-400 font-bold">100.00%</span></div>
+              <div className="flex justify-between"><span>COMPLEXITY METRIC:</span><span className="text-emerald-500">O(1) CONSTANT</span></div>
             </div>
 
-            {/* List Array Map Block */}
-            <div className="text-[8px] font-black uppercase tracking-widest text-emerald-700 border-b border-emerald-950 pb-1 mt-1">SECURE INDEXED NODES ({filteredArtifacts.length})</div>
+            <div className="text-[8px] font-black uppercase tracking-widest text-emerald-700 border-b border-emerald-950 pb-1 mt-1">SECURE DATA MAPS ({filteredArtifacts.length})</div>
             <div className="space-y-1.5 flex-1 overflow-y-auto custom-scrollbar pr-1">
               {filteredArtifacts.map((item) => (
                 <div 
@@ -313,7 +358,7 @@ export default function ArcheologistDashboard() {
                     <div className="flex space-x-2 mt-1 text-[8px] opacity-60 font-mono font-normal"><span>{item.year}</span><span>•</span><span className="uppercase">{item.language}</span></div>
                   </button>
                   {isAdmin && (
-                    <button onClick={() => handleDeleteArtifact(item.id)} className="text-red-900 hover:text-red-400 p-1 transition ml-1" title="Drop Matrix Block">
+                    <button onClick={() => handleDeleteArtifact(item.id)} className="text-red-900 hover:text-red-400 p-1 transition ml-1" title="Drop Matrix Sector">
                       <Trash2 className="h-3 w-3" />
                     </button>
                   )}
@@ -321,13 +366,13 @@ export default function ArcheologistDashboard() {
               ))}
             </div>
 
-            {/* MAIN SYSTEM DEVELOPER PROFILE BADGE */}
+            {/* EXPERT BADGE NODAL SIGNATURE */}
             <div className="border border-emerald-950 bg-emerald-950/5 p-2.5 rounded flex items-center space-x-2.5 mt-auto shadow-inner">
               <div className="h-8 w-8 bg-black border border-emerald-900 rounded flex items-center justify-center"><User className="h-4 w-4 text-emerald-500" /></div>
               <div className="flex-1 min-w-0">
-                <div className="text-[7px] font-black text-emerald-700 tracking-wider">SECURE IDENTITY</div>
+                <div className="text-[7px] font-black text-emerald-700 tracking-wider">IDENTITY VECTOR</div>
                 <div className="text-xs font-black text-emerald-300 truncate tracking-widest">M. RAJDOOT</div>
-                <div className="text-[8px] text-emerald-600 font-mono tracking-tighter mt-0.5 uppercase">Data Scientist / Core Dev</div>
+                <div className="text-[8px] text-emerald-600 font-mono tracking-tighter mt-0.5 uppercase">Data Science / Systems Engineer</div>
               </div>
               <Zap className="h-3 w-3 text-emerald-400 animate-pulse shrink-0" />
             </div>
@@ -335,7 +380,7 @@ export default function ArcheologistDashboard() {
           </div>
         </aside>
 
-        {/* Center Panel Monitor Screen Viewing Workspace */}
+        {/* Center Panel: Code Workspace Viewer Module */}
         <main className="flex-1 flex flex-col bg-gray-950/10 overflow-hidden border-r border-emerald-900/40">
           {selectedArtifact && (
             <>
@@ -353,13 +398,13 @@ export default function ArcheologistDashboard() {
                     <button 
                       onClick={() => { setIsEditable(!isEditable); playBeep(600, 'sine', 0.05); }}
                       className={`p-2 border rounded transition ${isEditable ? 'bg-emerald-500 text-black border-emerald-400' : 'border-emerald-950 text-emerald-600 hover:text-emerald-400'}`}
-                      title="Toggle System Editor"
+                      title="Toggle Local System Editor"
                     >
                       <Edit3 className="h-3.5 w-3.5" />
                     </button>
                   )}
                   {isEditable && isAdmin && (
-                    <button onClick={handleUpdateArtifact} className="p-2 border border-cyan-900 bg-cyan-950/40 text-cyan-400 hover:bg-cyan-500 hover:text-black rounded transition" title="Save Modifications">
+                    <button onClick={handleUpdateArtifact} className="p-2 border border-cyan-900 bg-cyan-950/40 text-cyan-400 hover:bg-cyan-500 hover:text-black rounded transition" title="Save Encrypted Mod">
                       <Save className="h-3.5 w-3.5" />
                     </button>
                   )}
@@ -368,17 +413,17 @@ export default function ArcheologistDashboard() {
                     className={`flex items-center space-x-2.5 px-4 py-2 rounded font-black text-xs tracking-widest border transition-all duration-300 ${isRunning ? 'bg-black text-emerald-900 border-emerald-950' : 'bg-emerald-500 hover:bg-emerald-400 text-gray-950 border-emerald-400 hover:shadow-[0_0_15px_rgba(52,211,153,0.3)]'}`}
                   >
                     <Play className="h-3 w-3 fill-current" />
-                    <span>{isRunning ? 'SANDBOXING...' : 'RUN_EMULATOR'}</span>
+                    <span>{isRunning ? 'COMPILE_RUN...' : 'RUN_EMULATOR'}</span>
                   </button>
                 </div>
               </div>
 
-              {/* Dynamic Viewport/Editor */}
+              {/* Secure Pre-formatted Code Block */}
               <div className="flex-1 bg-black/70 font-mono text-xs leading-relaxed p-4 overflow-hidden relative flex flex-col shadow-inner select-text">
                 {isEditable ? (
                   <textarea
                     value={editedCode} onChange={(e) => setEditedCode(e.target.value)}
-                    className="w-full flex-1 bg-transparent text-emerald-400 border-none outline-none font-mono text-xs leading-relaxed resize-none custom-scrollbar shadow-inner"
+                    className="w-full flex-1 bg-transparent text-emerald-400 border-none outline-none font-mono text-xs leading-relaxed resize-none custom-scrollbar"
                   />
                 ) : (
                   <pre className="text-emerald-400/90 whitespace-pre-wrap overflow-y-auto flex-1 custom-scrollbar">{editedCode}</pre>
@@ -387,7 +432,7 @@ export default function ArcheologistDashboard() {
             </>
           )}
 
-          {/* Lower Terminal Command Prompt Console */}
+          {/* Shell Command Console Prompter */}
           <div className="h-44 bg-black p-4 flex flex-col border-t border-emerald-900/40 shadow-2xl relative">
             <div className="text-[8px] text-emerald-600 font-bold tracking-widest uppercase mb-2 flex justify-between items-center">
               <span>[CORE_COMMAND_PROMPT_SHELL]</span>
@@ -398,50 +443,49 @@ export default function ArcheologistDashboard() {
               {emulatorOutput}
             </div>
 
-            {/* Interactive Hacker Shell Prompt Input */}
             <form onSubmit={handleTerminalCommand} className="mt-2 pt-1 border-t border-emerald-950 flex items-center space-x-2">
               <span className="text-emerald-600 text-xs font-bold font-mono">rajdoot@core:~#</span>
               <input 
                 type="text" value={terminalInput} onChange={e => setTerminalInput(e.target.value)}
-                placeholder="Type 'help' or commands here..."
+                placeholder="Type 'help' or native system directives..."
                 className="flex-1 bg-transparent text-emerald-400 text-xs font-mono border-none outline-none focus:ring-0 p-0"
               />
             </form>
           </div>
         </main>
 
-        {/* Right Panel Block: Locked Encryption Repository Dashboard */}
+        {/* Right Section: Core Encryption Upload Channel Container */}
         <section className="w-80 bg-black/40 p-4 flex flex-col space-y-4 overflow-y-auto backdrop-blur-md">
           
           {!isAdmin ? (
-            /* SECURITY INPUT LOCKED PORTAL */
+            /* SECURITY INPUT LOCKED BRUTE FORCE SHIELD */
             <div className="flex-1 flex flex-col items-center justify-center p-4 text-center space-y-4 my-auto">
               <div className="h-10 w-10 border border-dashed border-red-900 bg-red-950/20 rounded-full flex items-center justify-center text-red-500 animate-pulse">
                 <Lock className="h-4 w-4" />
               </div>
               <div>
-                <h3 className="text-xs font-black tracking-widest text-red-400 uppercase">INJECTION PORT LOCK</h3>
-                <p className="text-[9px] text-emerald-700 mt-1 uppercase font-semibold leading-4">Firewall layer blocking node structural modifications. Verify root authority token.</p>
+                <h3 className="text-xs font-black tracking-widest text-red-400 uppercase">INJECTION GATE LOCKED</h3>
+                <p className="text-[9px] text-emerald-700 mt-1 uppercase font-semibold leading-4">Kernel mitigation protocols active. Verify root token validation string.</p>
               </div>
               
               <form onSubmit={handleAuthBypass} className="w-full space-y-2">
                 <input 
-                  type="password" placeholder="ENTER CRYPTO PHRASE..." value={passphrase}
+                  type="password" disabled={isLockedOut} placeholder={isLockedOut ? "MODULE FROZEN" : "ENTER SECRET TOKEN..."} value={passphrase}
                   onChange={(e) => setPassphrase(e.target.value)}
-                  className="w-full bg-black border border-red-950 rounded p-2.5 text-center text-xs tracking-widest text-red-500 font-mono focus:outline-none focus:border-red-700 shadow-inner"
+                  className="w-full bg-black border border-red-950 rounded p-2.5 text-center text-xs tracking-widest text-red-500 font-mono focus:outline-none focus:border-red-700 shadow-inner disabled:opacity-40"
                 />
                 {authError && <div className="text-[9px] text-red-500 font-bold uppercase tracking-wide">{authError}</div>}
-                <button type="submit" className="w-full border border-red-900 bg-red-950/40 text-red-400 py-1.5 rounded font-black uppercase text-[9px] tracking-widest hover:bg-red-900 hover:text-black transition">
+                <button type="submit" disabled={isLockedOut} className="w-full border border-red-900 bg-red-950/40 text-red-400 py-1.5 rounded font-black uppercase text-[9px] tracking-widest hover:bg-red-900 hover:text-black transition disabled:opacity-40">
                   BYPASS SECURE FIREWALL
                 </button>
               </form>
             </div>
           ) : (
-            /* SECURE IMMUTABLE UPLOAD CHANNEL FORM */
+            /* SECURE IMMUTABLE INJECTION PAYLOAD CONTAINER */
             <>
               <div className="flex flex-col">
                 <div className="text-[8px] font-black text-cyan-400 tracking-widest uppercase mb-0.5 flex items-center">
-                  <Unlock className="h-3 w-3 mr-1 animate-pulse" /> Security Protocol Bypassed
+                  <Unlock className="h-3 w-3 mr-1 animate-pulse" /> Root Signature Validated
                 </div>
                 <div className="text-xs font-black text-emerald-300 tracking-widest uppercase retro-glow flex items-center">
                   <PlusCircle className="h-4 w-4 mr-1.5 text-emerald-500" />
@@ -449,20 +493,20 @@ export default function ArcheologistDashboard() {
                 </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
+              <form onSubmit={handleSubmit} className="space-y-3 text-xs">
                 <div>
-                  <label className="text-[9px] font-black text-emerald-800 uppercase tracking-widest block mb-1">Project Identifier</label>
-                  <input required type="text" value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="Doom Core Storage" className="w-full bg-black border border-emerald-950 p-2.5 text-emerald-400 font-mono focus:outline-none focus:border-emerald-600 rounded transition" />
+                  <label className="text-[9px] font-black text-emerald-800 uppercase tracking-widest block mb-1">Project Title</label>
+                  <input required type="text" value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="Doom Vector Graphics" className="w-full bg-black border border-emerald-950 p-2.5 text-emerald-400 font-mono focus:outline-none focus:border-emerald-600 rounded" />
                 </div>
 
-                <div className="grid grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-2 gap-2">
                   <div>
                     <label className="text-[9px] font-black text-emerald-800 uppercase tracking-widest block mb-1">Language</label>
-                    <input required type="text" value={newLanguage} onChange={e => setNewLanguage(e.target.value)} placeholder="Assembly" className="w-full bg-black border border-emerald-950 p-2.5 text-emerald-400 font-mono focus:outline-none focus:border-emerald-500 rounded" />
+                    <input required type="text" value={newLanguage} onChange={e => setNewLanguage(e.target.value)} placeholder="Pascal" className="w-full bg-black border border-emerald-950 p-2.5 text-emerald-400 font-mono focus:outline-none focus:border-emerald-500 rounded" />
                   </div>
                   <div>
                     <label className="text-[9px] font-black text-emerald-800 uppercase tracking-widest block mb-1">Build Year</label>
-                    <input required type="number" value={newYear} onChange={e => setNewYear(e.target.value)} placeholder="1993" className="w-full bg-black border border-emerald-950 p-2.5 text-emerald-400 font-mono focus:outline-none focus:border-emerald-500 rounded" />
+                    <input required type="number" value={newYear} onChange={e => setNewYear(e.target.value)} placeholder="1995" className="w-full bg-black border border-emerald-950 p-2.5 text-emerald-400 font-mono focus:outline-none focus:border-emerald-500 rounded" />
                   </div>
                 </div>
 
@@ -477,13 +521,13 @@ export default function ArcheologistDashboard() {
                 </div>
 
                 <div>
-                  <label className="text-[9px] font-black text-emerald-800 uppercase tracking-widest block mb-1">Archive Context Meta</label>
-                  <textarea rows="2" required value={newDescription} onChange={e => setNewDescription(e.target.value)} placeholder="Sector metadata indexing..." className="w-full bg-black border border-emerald-950 p-2.5 text-emerald-400 font-mono focus:outline-none focus:border-emerald-500 rounded resize-none" />
+                  <label className="text-[9px] font-black text-emerald-800 uppercase tracking-widest block mb-1">Historical Context Meta</label>
+                  <textarea rows="2" required value={newDescription} onChange={e => setNewDescription(e.target.value)} placeholder="Archival description parameters..." className="w-full bg-black border border-emerald-950 p-2.5 text-emerald-400 font-mono focus:outline-none focus:border-emerald-500 rounded resize-none" />
                 </div>
 
                 <div className="space-y-1 flex-1 flex flex-col min-h-[110px]">
                   <label className="text-[9px] font-black text-emerald-800 uppercase tracking-widest block mb-1">Source Payload Stream</label>
-                  <textarea required value={newCode} onChange={e => setNewCode(e.target.value)} placeholder={`void main() {\n  // Anti-injection enabled\n}`} className="w-full flex-1 bg-black border border-emerald-950 p-2.5 text-emerald-400 font-mono focus:outline-none focus:border-emerald-500 rounded resize-none text-[11px] leading-4" />
+                  <textarea required value={newCode} onChange={e => setNewCode(e.target.value)} placeholder={`void main() {\n}`} className="w-full flex-1 bg-black border border-emerald-950 p-2.5 text-emerald-400 font-mono focus:outline-none focus:border-emerald-500 rounded resize-none text-[11px]" />
                 </div>
 
                 <div className="text-[9px] font-black text-emerald-400 uppercase tracking-wider animate-pulse min-h-[12px]">{formStatus}</div>
@@ -497,42 +541,41 @@ export default function ArcheologistDashboard() {
 
           <div className="p-3 border border-dashed border-emerald-950 bg-black/40 rounded flex items-start space-x-2 mt-auto">
             <ShieldAlert className="h-3.5 w-3.5 text-emerald-900 mt-0.5 shrink-0 animate-bounce" />
-            <p className="text-[9px] text-emerald-800 leading-4 font-bold uppercase tracking-wider">Firewall Warning: XSS Anti-injection sanitization engine operational.</p>
+            <p className="text-[9px] text-emerald-800 leading-4 font-bold uppercase tracking-wider">Firewall Status: Anti-Brute Force encryption filter fully engaged.</p>
           </div>
         </section>
 
       </div>
 
-      {/* FOOTER META MANIFEST SPECIFICATIONS BLOCK */}
+      {/* Structural Hardware Manifest Footer */}
       <footer className="border-t border-emerald-900 bg-gray-950 px-6 py-1.5 flex justify-between items-center text-[9px] text-emerald-700 font-bold tracking-widest z-20">
         <div className="flex space-x-4 items-center">
-          <span className="flex items-center text-emerald-600"><Info className="h-3 w-3 mr-1" /> CORE BUILD: RAJDOOT-SYS-0x24</span>
-          <span>COMPILER: VITE 8.1 / REACT 18</span>
-          <span>CLUSTER REGISTRY: CLOUD POSTGRES</span>
+          <span className="flex items-center text-emerald-600"><Info className="h-3 w-3 mr-1" /> CORE BUILD: RAJDOOT-SYS-0x50</span>
+          <span>COMPILER: VITE 8.1 / CLOUD POSTGRES</span>
         </div>
         <div>
-          <span>© 2026 ARCHIVE NETWORKS. ENGINEERED BY MANISH RAJDOOT. ALL SECTORS PROTECTED.</span>
+          <span>© 2026 ARCHIVE NETWORKS. ENGINEERED BY MANISH RAJDOOT. ALL SECTORS SECURED.</span>
         </div>
       </footer>
 
-      {/* EASTER EGG: MANISH RAJDOOT HIDDEN SOCIALS TERMINAL OVERLAY */}
+      {/* EASTER EGG: HIDDEN DECRYPTED PORTS FOR CONTROL LINK CHANNELS */}
       {showHiddenSocials && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 p-4 crt-effect">
+        <div className="fixed inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center z-50 p-4 crt-effect">
           <div className="bg-gray-900 border-2 border-cyan-500 p-6 rounded max-w-sm w-full space-y-4 text-center relative shadow-[0_0_30px_rgba(34,211,238,0.3)]">
             <div className="text-cyan-400 text-xs font-black tracking-[0.3em] uppercase border-b border-cyan-950 pb-2">
               🔗 DECRYPTED PORTALS FOUND
             </div>
-            <p className="text-[10px] text-emerald-600 font-mono uppercase">Direct operational communication lines for Architect Manish Rajdoot:</p>
+            <p className="text-[10px] text-emerald-600 font-mono uppercase">Direct core networks channels verified for Admin Manish Rajdoot:</p>
             
             <div className="space-y-2 text-xs font-bold uppercase">
-              <a href="https://github.com" target="_blank" rel="noreferrer" className="block p-2.5 bg-black border border-cyan-950 hover:border-cyan-400 text-cyan-400 rounded hover:shadow-[0_0_10px_rgba(34,211,238,0.2)] transition">
-                🌐 GITHUB CHANNELS
+              <a href="https://github.com/manishrajdoot" target="_blank" rel="noreferrer" className="block p-2.5 bg-black border border-cyan-950 hover:border-cyan-400 text-cyan-400 rounded hover:shadow-[0_0_10px_rgba(34,211,238,0.2)] transition">
+                🌐 GITHUB PIPELINE
               </a>
               <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="block p-2.5 bg-black border border-cyan-950 hover:border-cyan-400 text-cyan-400 rounded hover:shadow-[0_0_10px_rgba(34,211,238,0.2)] transition">
-                💼 LINKEDIN VAULT
+                💼 LINKEDIN ACCESS TERMINAL
               </a>
               <a href="https://manishrajdoot.com" target="_blank" rel="noreferrer" className="block p-2.5 bg-black border border-cyan-950 hover:border-cyan-400 text-cyan-400 rounded hover:shadow-[0_0_10px_rgba(34,211,238,0.2)] transition">
-                🗂️ DATA SCIENCE PORTFOLIO
+                🗂️ DATA SCIENCE ANALYTICS VAULT
               </a>
             </div>
 
